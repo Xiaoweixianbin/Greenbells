@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dreammerwei.com.greenbellweather.bean.City;
-import dreammerwei.com.greenbellweather.bean.Country;
+import dreammerwei.com.greenbellweather.bean.County;
 import dreammerwei.com.greenbellweather.bean.Province;
 
 /**
@@ -118,30 +118,30 @@ public class GreenWeatherDB {
     /*
    *  将Country实例存储到数据库
    *  */
-    public void saveCountry(Country country) {
-        if (country != null) {
+    public void saveCounty(County county) {
+        if (county != null) {
             ContentValues values = new ContentValues();
-            values.put("country_name", country.getConuntryName());
-            values.put("country_code", country.getConuntryCode());
-            values.put("city_id", country.getCityId());
-            db.insert("Country", null, values);
+            values.put("county_name", county.getCountyName());
+            values.put("county_code", county.getCountyCode());
+            values.put("city_id", county.getCityId());
+            db.insert("County", null, values);
         }
     }
 
     /*
     * 从数据库中读取全国的所有的省份信息
     * */
-    public List<Country> loadCountries(int cityId) {
-        List<Country> list = new ArrayList<Country>();
-        Cursor cursor = db.query("Country", null, "city_id = ?", new String[]{String.valueOf(cityId)}, null, null, null);
+    public List<County> loadCounties(int cityId) {
+        List<County> list = new ArrayList<County>();
+        Cursor cursor = db.query("County", null, "city_id = ?", new String[]{String.valueOf(cityId)}, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                Country country = new Country();
-                country.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                country.setConuntryName(cursor.getString(cursor.getColumnIndex("country_name")));
-                country.setConuntryCode(cursor.getString(cursor.getColumnIndex("country_code")));
-                country.setCityId(cityId);
-                list.add(country);
+                County county = new County();
+                county.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                county.setCountyName(cursor.getString(cursor.getColumnIndex("county_name")));
+                county.setCountyCode(cursor.getString(cursor.getColumnIndex("county_code")));
+                county.setCityId(cityId);
+                list.add(county);
             } while (cursor.moveToNext());
         }
         if (cursor != null) {
