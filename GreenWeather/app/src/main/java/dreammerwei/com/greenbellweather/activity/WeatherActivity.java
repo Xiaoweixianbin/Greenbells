@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import dreammerwei.com.greenbellweather.R;
+import dreammerwei.com.greenbellweather.service.AutoUpdateService;
 import dreammerwei.com.greenbellweather.util.HttpCallbackListener;
 import dreammerwei.com.greenbellweather.util.HttpUtil;
 import dreammerwei.com.greenbellweather.util.Utility;
@@ -82,11 +83,10 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.switch_city:
 
-                Intent intent = new Intent();
+                Intent intent = new Intent(this,ChooseAreaActivity.class);
                 intent.putExtra("from_weather_activity", true);
-                intent.setClass(WeatherActivity.this, ChooseAreaActivity.class);
                 startActivity(intent);
-                WeatherActivity.this.finish();
+                finish();
                 break;
             case R.id.refresh_weather:
                 publishText.setText("同步中···");
@@ -174,6 +174,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         currentDateText.setText(prefs.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+        Intent intent= new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 
     //初始化各控件
