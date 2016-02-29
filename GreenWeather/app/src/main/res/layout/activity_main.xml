@@ -4,5 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/id_swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include layout="@layout/item_position"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/id_recyclerview"
+            android:divider="#ffff0000"
+            android:dividerHeight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </LinearLayout>

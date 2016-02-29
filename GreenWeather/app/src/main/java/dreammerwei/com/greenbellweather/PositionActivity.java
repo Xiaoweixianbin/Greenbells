@@ -54,25 +54,6 @@ public class PositionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_position);
 
-        /*FormEncodingBuilder builder = new FormEncodingBuilder();
-        builder.add("username", "sfsf");
-        Request request = new Request.Builder()
-                .url("https://api.heweather.com/x3/weather?cityid=CN101190101&key=049dc522c8014490b1f3993944c44088")
-                .post(builder.build())
-                .build();
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-
-            }
-        });*/
-
-
         tv = (TextView) findViewById(R.id.id_position);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //获取所有可用的位置提供器
