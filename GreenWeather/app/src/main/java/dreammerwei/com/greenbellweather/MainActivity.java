@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -43,15 +44,22 @@ import java.io.IOException;
 import java.util.List;
 
 import dreammerwei.com.greenbellweather.adapter.RecyclerAdapter;
+import dreammerwei.com.greenbellweather.model.HeWeatherDataService30;
 import dreammerwei.com.greenbellweather.model.WeatherBean;
 import dreammerwei.com.greenbellweather.util.GetData;
+import dreammerwei.com.greenbellweather.util.RetrofitUtil;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Observer;
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.observers.Observers;
+import rx.schedulers.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -119,6 +127,47 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
 
+        mRecyclerView= (RecyclerView) findViewById(R.id.recyclerview);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+    }
+
+
+
+
+    private void fecthDataByNetWork(Observer<HeWeatherDataService30> observer){
+        String cityname ="北京";
+        if (cityname !=null){
+            cityname = cityname.replace("市", "")
+                    .replace("省", "")
+                    .replace("自治区", "")
+                    .replace("特别行政区", "")
+                    .replace("地区", "")
+                    .replace("盟", "");
+        }
+        RetrofitUtil.getApiService(this)
+                .mWeather(cityname,"key")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(new Func1<WeatherBean, Boolean>() {
+                    @Override
+                    public Boolean call(WeatherBean weatherBean) {
+                        return weatherBean.getHeWeatherDataService30s().get(0).getStatus().equals("ok");
+                    }
+                })
+                .map(new Func1<WeatherBean, HeWeatherDataService30>() {
+                    @Override
+                    public HeWeatherDataService30 call(WeatherBean weatherBean) {
+                        return weatherBean.getHeWeatherDataService30s().get(0);
+                    }
+                })
+                .doOnNext(new Action1<HeWeatherDataService30>() {
+                    @Override
+                    public void call(HeWeatherDataService30 heWeatherDataService30) {
+                        
+                    }
+                })
+                .subscribe(observer);
     }
 
 
@@ -180,64 +229,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         @Override
         public void onReceiveLocation(BDLocation location) {
             //Receive Location
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("time : ");
-            sb.append(location.getTime());
-            sb.append("\nerror code : ");
-            sb.append(location.getLocType());
-            sb.append("\nlatitude : ");
-            sb.append(location.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(location.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(location.getRadius());
-            if (location.getLocType() == BDLocation.TypeGpsLocation){// GPS定位结果
-                sb.append("\nspeed : ");
-                sb.append(location.getSpeed());// 单位：公里每小时
-                sb.append("\nsatellite : ");
-                sb.append(location.getSatelliteNumber());
-                sb.append("\nheight : ");
-                sb.append(location.getAltitude());// 单位：米
-                sb.append("\ndirection : ");
-                sb.append(location.getDirection());// 单位度
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-                sb.append("\ndescribe : ");
-                sb.append("gps定位成功");
+            if (location!=null){
 
-            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){// 网络定位结果
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-                //运营商信息
-                sb.append("\noperationers : ");
-                sb.append(location.getOperators());
-                sb.append("\ndescribe : ");
-                sb.append("网络定位成功");
-            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
-                sb.append("\ndescribe : ");
-                sb.append("离线定位成功，离线定位结果也是有效的");
-            } else if (location.getLocType() == BDLocation.TypeServerError) {
-                sb.append("\ndescribe : ");
-                sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
-            } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
-                sb.append("\ndescribe : ");
-                sb.append("网络不同导致定位失败，请检查网络是否通畅");
-            } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-                sb.append("\ndescribe : ");
-                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+            }else {
+                Log.i("BaiduLocationApiDem", "error");
             }
-            sb.append("\nlocationdescribe : ");
-            sb.append(location.getLocationDescribe());// 位置语义化信息
-            List<Poi> list = location.getPoiList();// POI数据
-            if (list != null) {
-                sb.append("\npoilist size = : ");
-                sb.append(list.size());
-                for (Poi p : list) {
-                    sb.append("\npoi= : ");
-                    sb.append(p.getId() + " " + p.getName() + " " + p.getRank());
-                }
-            }
-            Log.i("BaiduLocationApiDem", location.getCity());
+
+
         }
     }
 }

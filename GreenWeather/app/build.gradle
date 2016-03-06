@@ -30,4 +30,5 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile files('libs/BaiduLBS_Android.jar')
     compile 'com.android.support:design:23.1.1'
+    compile 'io.reactivex:rxandroid:1.1.0'
 }
