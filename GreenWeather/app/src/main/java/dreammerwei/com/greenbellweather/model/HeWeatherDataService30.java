@@ -1,13 +1,14 @@
 
 package dreammerwei.com.greenbellweather.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class HeWeatherDataService30 {
+public class HeWeatherDataService30 implements Serializable {
 
     @SerializedName("aqi")
     @Expose

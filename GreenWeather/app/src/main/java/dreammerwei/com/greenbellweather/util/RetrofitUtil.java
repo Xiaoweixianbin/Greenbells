@@ -56,9 +56,9 @@ public class RetrofitUtil {
         init(context);
         return getOkHtoopClient(context);
     }
-    public static void disposeFailure(Throwable e, Context context, View view){
+    public static void disposeFailure(Throwable e, Context context){
         if (e.toString().contains("GaiException") || e.toString().contains("SocketTimeoutException")||e.toString().contains("UnknownHostException")){
-            Snackbar.make(view,"网络连接出错", Toast.LENGTH_LONG).show();
+            Toast.makeText(context,"网络连接出错", Toast.LENGTH_LONG).show();
         }
     }
 }
