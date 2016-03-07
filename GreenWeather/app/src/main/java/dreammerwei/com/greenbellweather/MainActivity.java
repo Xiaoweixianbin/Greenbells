@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -74,12 +75,17 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private Util mUtil = Util.getInstance();
     private ACache aCache = ACache.get(MainActivity.this);
 
+    private TextView tvCity;
+    private TextView tvCond;
+    private TextView tvUpdateTime;
+    private TextView tvTime;
     private ProgressBar mProgressBar;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mRefreshLayout;
     private RecyclerAdapter mAdapter;
     private Observer<HeWeatherDataService30> observer;
     private boolean isLocaiton = false;
+    private long exitTime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mLocationClient = new LocationClient(getApplicationContext());
@@ -87,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initIcon();
         fetchData();
         if (Util.isNetWorkConneted(this)){
             initLocation();
@@ -98,6 +105,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void initView(){
+        tvCity = (TextView) findViewById(R.id.id_city);
+        tvCond = (TextView) findViewById(R.id.id_condTxt);
+        tvTime = (TextView) findViewById(R.id.id_time);
+        tvUpdateTime = (TextView) findViewById(R.id.id_updatetime);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.VISIBLE);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
@@ -105,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         mRecyclerView= (RecyclerView) findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+        tvCity.setText(mUtil.getString(Util.CITY_NAME, "南京市"));
+        tvTime.setText(Util.getYMD(new Date()));
     }
 
     private void fetchData(){
@@ -125,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 new RefreshHanler().sendEmptyMessage(2);
                 mAdapter = new RecyclerAdapter(heWeatherDataService30,MainActivity.this);
                 mRecyclerView.setAdapter(mAdapter);
-
+                tvCond.setText(heWeatherDataService30.getAqi().getCity().getQlty());
+                tvUpdateTime.setText(heWeatherDataService30.getBasic().getUpdate().getLoc());
             }
         };
         fetchDataByCache(observer);
@@ -188,8 +203,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
 
 
-
-
+    private void initIcon(){
+        mUtil.putInt("未知", R.mipmap.none);
+        mUtil.putInt("晴", R.mipmap.sunny);
+        mUtil.putInt("阴", R.mipmap.overcast);
+        mUtil.putInt("多云", R.mipmap.cloudy);
+        mUtil.putInt("少云", R.mipmap.fewcloudy);
+        mUtil.putInt("晴间多云", R.mipmap.partlycloudy);
+        mUtil.putInt("小雨", R.mipmap.lightrain);
+        mUtil.putInt("中雨", R.mipmap.moderaterain);
+        mUtil.putInt("大雨", R.mipmap.heavyrain);
+        mUtil.putInt("阵雨", R.mipmap.showerrain);
+        mUtil.putInt("雷阵雨", R.mipmap.thundershower);
+        mUtil.putInt("霾", R.mipmap.haze);
+        mUtil.putInt("雾", R.mipmap.foggy);
+    }
 
 
 
@@ -232,6 +260,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if ((System.currentTimeMillis() - exitTime) > 2000){
+            Toast.makeText(this,"再按一次退出程序",Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        }else {
+            finish();
+        }
+    }
 
     @SuppressLint("HandlerLeak")
     class RefreshHanler extends Handler{

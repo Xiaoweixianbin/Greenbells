@@ -34,7 +34,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/id_update"
+                android:id="@+id/id_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2016.02.28" />
@@ -44,6 +44,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/id_updatetime"
                     android:gravity="right"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

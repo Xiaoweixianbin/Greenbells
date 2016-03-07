@@ -1,9 +1,13 @@
 package dreammerwei.com.greenbellweather.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import dreammerwei.com.greenbellweather.base.BaseApplication;
 
@@ -79,5 +83,20 @@ public class Util {
             }
         }
         return false;
+    }
+
+
+    /**
+     * yyyy-MM-dd
+     * @param date
+     * @return
+     */
+    @SuppressLint("SimpleDateFormat")
+    public static String getYMD(Date date){
+
+        SimpleDateFormat mDateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd");
+        String dateS = mDateFormat.format(date);
+        return dateS;
     }
 }
