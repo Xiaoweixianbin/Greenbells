@@ -1,13 +1,14 @@
 
 package dreammerwei.com.greenbellweather.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class WeatherBean {
+public class WeatherBean implements Serializable {
     @SerializedName("HeWeather data service 3.0") @Expose
     private List<HeWeatherDataService30> heWeatherDataService30s
             = new ArrayList<>();

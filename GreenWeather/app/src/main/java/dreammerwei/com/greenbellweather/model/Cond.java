@@ -5,7 +5,9 @@ package dreammerwei.com.greenbellweather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Cond {
+import java.io.Serializable;
+
+public class Cond implements Serializable {
 
     @SerializedName("code_d")
     @Expose

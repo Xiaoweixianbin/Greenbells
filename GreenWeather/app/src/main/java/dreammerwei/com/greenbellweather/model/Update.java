@@ -5,7 +5,9 @@ package dreammerwei.com.greenbellweather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Update {
+import java.io.Serializable;
+
+public class Update implements Serializable {
 
     @SerializedName("loc")
     @Expose

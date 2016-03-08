@@ -36,16 +36,15 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="DU2OESspIWTyLqk9s5Trv1MD" />       //key:开发者申请的key
-        <activity android:name=".PositionActivity">
-
-        </activity>
+            android:value="DU2OESspIWTyLqk9s5Trv1MD" />
+        //key:开发者申请的key
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PredictActivity"/>
 
     </application>
 

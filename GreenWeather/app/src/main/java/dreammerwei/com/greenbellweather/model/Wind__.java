@@ -5,7 +5,9 @@ package dreammerwei.com.greenbellweather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Wind__ {
+import java.io.Serializable;
+
+public class Wind__ implements Serializable {
 
     @SerializedName("deg")
     @Expose

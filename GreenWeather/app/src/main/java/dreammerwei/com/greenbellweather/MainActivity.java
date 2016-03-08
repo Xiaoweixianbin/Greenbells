@@ -1,24 +1,18 @@
 package dreammerwei.com.greenbellweather;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.nfc.Tag;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,52 +22,37 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.location.Poi;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Executors;
 
+import dreammerwei.com.greenbellweather.adapter.HeaderViewRecyclerAdapter;
 import dreammerwei.com.greenbellweather.adapter.RecyclerAdapter;
+import dreammerwei.com.greenbellweather.base.BaseActivity;
 import dreammerwei.com.greenbellweather.model.HeWeatherDataService30;
 import dreammerwei.com.greenbellweather.model.WeatherBean;
 import dreammerwei.com.greenbellweather.util.ACache;
-import dreammerwei.com.greenbellweather.util.GetData;
+import dreammerwei.com.greenbellweather.util.EndlessRecyclerOnScrollListener;
 import dreammerwei.com.greenbellweather.util.RetrofitUtil;
 import dreammerwei.com.greenbellweather.util.Util;
-import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.observers.Observers;
 import rx.schedulers.Schedulers;
 
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+    private static final String HEAD = "weather";
     private static final String TAG = MainActivity.class.getSimpleName();
     public LocationClient mLocationClient = null;
     public BDLocationListener myListener =new  MyLocationListener();
-    private Util mUtil = Util.getInstance();
-    private ACache aCache = ACache.get(MainActivity.this);
+
+    private HeaderViewRecyclerAdapter stringAdapter;
+    private GridLayoutManager gridLayoutManager;
+    private ProgressBar onLoadMore;
+
+
 
     private TextView tvCity;
     private TextView tvCond;
@@ -114,8 +93,18 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
 
+
         mRecyclerView= (RecyclerView) findViewById(R.id.recyclerview);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        gridLayoutManager = new GridLayoutManager(this,2);
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return ((stringAdapter.getItemCount() - 1) == position) ? gridLayoutManager.getSpanCount() : 1;
+            }
+        });
 
         tvCity.setText(mUtil.getString(Util.CITY_NAME, "南京市"));
         tvTime.setText(Util.getYMD(new Date()));
@@ -134,13 +123,27 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
 
             @Override
-            public void onNext(HeWeatherDataService30 heWeatherDataService30) {
+            public void onNext(final HeWeatherDataService30 heWeatherDataService30) {
                 mProgressBar.setVisibility(View.INVISIBLE);
                 new RefreshHanler().sendEmptyMessage(2);
                 mAdapter = new RecyclerAdapter(heWeatherDataService30,MainActivity.this);
-                mRecyclerView.setAdapter(mAdapter);
+                stringAdapter = new HeaderViewRecyclerAdapter(mAdapter);
+                createLoadMoreView();
+                mRecyclerView.setAdapter(stringAdapter);
                 tvCond.setText(heWeatherDataService30.getAqi().getCity().getQlty());
                 tvUpdateTime.setText(heWeatherDataService30.getBasic().getUpdate().getLoc());
+                mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(gridLayoutManager) {
+                    @Override
+                    public void onLoadMore(int currentPage) {
+                        Intent intent = new Intent();
+                        intent.setClass(MainActivity.this,PredictActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(HEAD,heWeatherDataService30);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        onLoadMore.setVisibility(View.GONE);
+                    }
+                });
             }
         };
         fetchDataByCache(observer);
@@ -244,6 +247,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void onRefresh() {
         fetchDataByNetWork(observer);
     }
+
+    private void createLoadMoreView() {
+        View loadMoreView = LayoutInflater
+                .from(MainActivity.this)
+                .inflate(R.layout.view_load_more, mRecyclerView, false);
+        onLoadMore = (ProgressBar) loadMoreView.findViewById(R.id.load_progress_bar);
+        stringAdapter.addFooterView(loadMoreView);
+    }
+
 
     public class MyLocationListener implements BDLocationListener {
 

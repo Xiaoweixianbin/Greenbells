@@ -5,7 +5,9 @@ package dreammerwei.com.greenbellweather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Uv {
+import java.io.Serializable;
+
+public class Uv implements Serializable {
 
     @SerializedName("brf")
     @Expose

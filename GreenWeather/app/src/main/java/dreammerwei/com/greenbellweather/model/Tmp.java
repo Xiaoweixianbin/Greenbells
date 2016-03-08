@@ -5,7 +5,9 @@ package dreammerwei.com.greenbellweather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Tmp {
+import java.io.Serializable;
+
+public class Tmp implements Serializable {
 
     @SerializedName("max")
     @Expose

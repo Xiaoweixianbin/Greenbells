@@ -5,7 +5,9 @@ package dreammerwei.com.greenbellweather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class DailyForecast {
+import java.io.Serializable;
+
+public class DailyForecast implements Serializable {
 
     @SerializedName("astro")
     @Expose
