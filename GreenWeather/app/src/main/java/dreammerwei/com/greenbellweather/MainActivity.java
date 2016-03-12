@@ -281,7 +281,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
         }
     }
 
-    @SuppressLint("HandlerLeak")
     class RefreshHanler extends Handler{
         @Override
         public void handleMessage(Message msg) {
